@@ -1,0 +1,5 @@
+    #dynamic.toml
+    [tls]
+      [[tls.certificates]]
+        certFile = "/etc/traefik/certs/docker_cert_crt.pem"
+        keyFile = "/etc/traefik/certs/docker_cert_key.pem"
