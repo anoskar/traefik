@@ -9,31 +9,30 @@
           - "80:80" # <== http           
           - "443:443" # <== https
         command:
-          - --api.insecure=no # <== Enabling insecure api, NOT RECOMMENDED FOR PRODUCTION
-          - --api.dashboard=true # <== Enabling the dashboard to view services, middlewares, routers, etc...
-          - --api.debug=true # <== Enabling additional endpoints for debugging and profiling
-          - --log.level=DEBUG # <== Setting the level of the logs from traefik
-          - --providers.docker=true # <== Enabling docker as the provider for traefik
-          - --providers.docker.exposedbydefault=false # <== Don't expose every container to traefik, only expose enabled ones
-          - --providers.docker.network=web # <== Operate on the docker network named web
-          - --entrypoints.web.address=:80 # <== Defining an entrypoint for port :80 named web
+          - --api.insecure=no # <== On cadenace l'API
+          - --api.dashboard=true # <== Activation du dashboard
+          - --api.debug=true # <== Mode debug on
+          - --log.level=DEBUG # <== Le level en mode debug est tres bavard
+          - --providers.docker=true # <== Docker est le provider de traefik
+          - --providers.docker.exposedbydefault=false # <== Tout nos containers ne seront pas necessairement expose a traefik
+          - --providers.docker.network=web # <== Creation du network utilise par traefik et tout les docker sy connectant
+          - --entrypoints.web.address=:80 # <== L entrypoint sur le port 80 nomme web
         volumes:
-          - /var/run/docker.sock:/var/run/docker.sock # <== Volume for docker admin
+          - /var/run/docker.sock:/var/run/docker.sock # 
           - $PWD/traefik.toml:/etc/traefik/traefik.toml
           - $PWD/dynamic.toml:/etc/traefik/dynamic.toml
           - $PWD/certs/:/etc/traefik/certs 
           - "/etc/timezone:/etc/timezone:ro" # meme timezone que l hote
-          - "/etc/localtime:/etc/localtime:ro"
-
+          - "/etc/localtime:/etc/localtime:ro" #meme timezone que l hote
           
         networks:
-          - web # <== Placing traefik on the network named web, to access containers on this network
+          - web # <== Traefik est connecte a ce network, il faudra le creer avant le premier lancement
         labels:
-          - "traefik.enable=true" # <== Enable traefik on itself to view dashboard and assign subdomain to view it
-          - "traefik.http.routers.api.rule=Host(`mon.domain`)" # <== Setting the domain for the dashboard
-          - "traefik.http.routers.api.service=api@internal" # <== Enabling the api to be a service to access
-          - "traefik.http.routers.api.middlewares=auth"
-          - "traefik.http.middlewares.auth.basicauth.users=mon_user:$mon_passwd"
+          - "traefik.enable=true" # 
+          - "traefik.http.routers.api.rule=Host(`mon.domain`)" # <== On definit le domaine
+          - "traefik.http.routers.api.service=api@internal" # <== L api
+          - "traefik.http.routers.api.middlewares=auth" # on active le middleware d authentification
+          - "traefik.http.middlewares.auth.basicauth.users=mon_user:$mon_passwd" # definition login / passwd. Passez par htpasswd pour le gen. ! au premier "$" obligatoire
             
     networks:
       web:
