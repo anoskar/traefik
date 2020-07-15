@@ -19,8 +19,8 @@
           - --entrypoints.web.address=:80 # <== L entrypoint sur le port 80 nomme web
         volumes:
           - /var/run/docker.sock:/var/run/docker.sock # 
-          - $PWD/traefik.toml:/etc/traefik/traefik.toml
-          - $PWD/dynamic.toml:/etc/traefik/dynamic.toml
+          - $PWD/traefik.toml:/etc/traefik/traefik.toml # ATTENTION dans ce git il est dans un autre dossier, move le fichier 
+          - $PWD/dynamic.toml:/etc/traefik/dynamic.toml # ATTENTION : N est NECESSAIRE UNIQUEMENT si vous jouez avec votre propre certificat, commenter si letsencrypt
           - $PWD/certs/:/etc/traefik/certs 
           - "/etc/timezone:/etc/timezone:ro" # meme timezone que l hote
           - "/etc/localtime:/etc/localtime:ro" #meme timezone que l hote
