@@ -1,0 +1,40 @@
+    version: "3.3"
+
+    services:
+      traefik:
+        image: traefik:latest
+        restart: always
+        container_name: traefik
+        ports:
+          - "80:80" # <== http           
+          - "443:443" # <== https
+        command:
+          - --api.insecure=no # <== Enabling insecure api, NOT RECOMMENDED FOR PRODUCTION
+          - --api.dashboard=true # <== Enabling the dashboard to view services, middlewares, routers, etc...
+          - --api.debug=true # <== Enabling additional endpoints for debugging and profiling
+          - --log.level=DEBUG # <== Setting the level of the logs from traefik
+          - --providers.docker=true # <== Enabling docker as the provider for traefik
+          - --providers.docker.exposedbydefault=false # <== Don't expose every container to traefik, only expose enabled ones
+          - --providers.docker.network=web # <== Operate on the docker network named web
+          - --entrypoints.web.address=:80 # <== Defining an entrypoint for port :80 named web
+        volumes:
+          - /var/run/docker.sock:/var/run/docker.sock # <== Volume for docker admin
+          - $PWD/traefik.toml:/etc/traefik/traefik.toml
+          - $PWD/dynamic.toml:/etc/traefik/dynamic.toml
+          - $PWD/certs/:/etc/traefik/certs 
+          - "/etc/timezone:/etc/timezone:ro" # meme timezone que l hote
+          - "/etc/localtime:/etc/localtime:ro"
+
+          
+        networks:
+          - web # <== Placing traefik on the network named web, to access containers on this network
+        labels:
+          - "traefik.enable=true" # <== Enable traefik on itself to view dashboard and assign subdomain to view it
+          - "traefik.http.routers.api.rule=Host(`mon.domain`)" # <== Setting the domain for the dashboard
+          - "traefik.http.routers.api.service=api@internal" # <== Enabling the api to be a service to access
+          - "traefik.http.routers.api.middlewares=auth"
+          - "traefik.http.middlewares.auth.basicauth.users=mon_user:$mon_passwd"
+            
+    networks:
+      web:
+        external: true
